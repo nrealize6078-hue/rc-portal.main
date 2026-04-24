@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>リアライズクラブ 各種コンテンツ | REALIZE CLUB</title>
+<meta name="description" content="リアライズクラブ会員様向け各種コンテンツ。AI相談「澪先生」、人生設計コンテンツ、生活支援サービス、各種ご相談窓口をご利用いただけます。" />
+
+<!-- Google Fonts: 上品なセリフ + 端正なゴシック -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- アニメーションライブラリ（CDNが落ちても動作するようフォールバック設計） -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<!-- 安全策：JSが何らかの理由で動かなくてもコンテンツは必ず見える -->
+<script>
+  // ローダーは何があっても必ず1.5秒で消す
+  setTimeout(function(){
+    var l = document.getElementById('loader');
+    if (l) l.classList.add('is-hidden');
+  }, 1500);
+  // 3秒後にフェード待ちの要素は強制表示
+  setTimeout(function(){
+    document.querySelectorAll('.js-fade, .js-fade-wrap').forEach(function(el){
+      if (!el.classList.contains('is-active')) el.classList.add('is-active');
+    });
+  }, 3000);
+</script>
+
+<style>
+/* ==========================================================
+ * Realize Club Contents - paris-yugao.jp inspired redesign
+ * デザイントークン
+ * ========================================================== */
+:root{
+  /* 背景：クリーム基調 + 純白セクション */
+  --bg-cream: #f8f4eb;
+  --bg-cream-deep: #f0e9d8;
+  --bg-white: #ffffff;
+  --bg-ink: #0f1d2e;
+
+  /* ブランドカラー（リアライズクラブ既存を維持しつつ高級感） */
+  --c-navy: #0d2c3d;          /* メインの紺 */
+  --c-navy-deep: #061a26;
+  --c-red: #e0533f;            /* CTAボタンの赤 */
+  --c-red-hover: #c8442f;
+  --c-yellow: #fce26b;         /* ハイライト（ライン） */
+  --c-gold: #bea976;           /* paris-yugao 由来の上品なゴールド */
+  --c-gold-soft: #d8c69a;
+
+  /* テキスト */
+  --t-main: #1d2733;
+  --t-sub: #5a6573;
+  --t-mute: #98a0aa;
+  --t-onbg-cream: #2c3340;
+
+  /* ライン */
+  --line: rgba(13,44,61,0.12);
+  --line-soft: rgba(13,44,61,0.06);
+
+  /* シャドウ */
+  --sh-soft: 0 6px 24px rgba(13,44,61,0.06);
+  --sh-mid:  0 14px 40px rgba(13,44,61,0.10);
+  --sh-deep: 0 28px 70px rgba(13,44,61,0.18);
+
+  /* タイポ */
+  --f-jp-serif: "Noto Serif JP", "Yu Mincho", "游明朝", serif;
+  --f-jp-sans:  "Noto Sans JP", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN", "Yu Gothic", sans-serif;
+  --f-en-serif: "Cormorant Garamond", "Cinzel", "Times New Roman", serif;
+  --f-en-deco:  "Cinzel", "Cormorant Garamond", serif;
+
+  /* 余白／半径 */
+  --r-sm: 6px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-pill: 999px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+
+/* ==========================================================
+ *  Reset & 基本
+ * ========================================================== */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:auto; -webkit-font-smoothing:antialiased; }
+body{
+  font-family:var(--f-jp-sans);
+  font-weight:400;
+  font-size: 17px;            /* 基準サイズを15→17pxに引き上げ */
+  color:var(--t-main);
+  background:var(--bg-cream);
+  line-height:1.85;
+  letter-spacing:.05em;
+  overflow-x:hidden;
+  /* 日本語の改行を文節ベースに（変な位置での改行を防ぐ） */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+/* 句読点や英数字の前後で詰めすぎないよう、見出しとリード文には phrase-aware を試行 */
+h1, h2, h3, h4, .hero__lead, .card__title, .card__desc, .mio__txt p, .cta-consult__txt p{
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; transition: color .3s var(--ease); }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; }
+
+/* lenis用 */
+html.lenis{ height:auto; }
+.lenis.lenis-smooth{ scroll-behavior:auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent]{ overscroll-behavior:contain; }
+.lenis.lenis-stopped{ overflow:hidden; }
+
+/* ==========================================================
+ *  ローダー
+ * ========================================================== */
+.loader{
+  position:fixed; inset:0; z-index:9999;
+  background:var(--bg-ink);
+  display:flex; align-items:center; justify-content:center;
+  transition: opacity .8s var(--ease), visibility .8s;
+}
+.loader.is-hidden{ opacity:0; visibility:hidden; }
+.loader__logo{
+  font-family:var(--f-en-deco); color:var(--c-gold);
+  font-size: clamp(22px, 4vw, 38px);
+  letter-spacing:.4em;
+  position:relative;
+  padding-bottom:14px;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.loader__logo::after{
+  content:""; position:absolute; left:50%; bottom:0; width:60px; height:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg, transparent, var(--c-gold), transparent);
+}
+@keyframes pulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
+
+/* ==========================================================
+ *  ヘッダー（エディトリアル仕様：大きめ・上品・改行抑制）
+ * ========================================================== */
+.site-header{
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 24px clamp(24px, 4vw, 64px);
+  transition: background .4s var(--ease), padding .4s var(--ease), border-color .4s var(--ease);
+  border-bottom:1px solid transparent;
+  backdrop-filter: blur(0px);
+  gap: 24px;
+}
+.site-header.is-scrolled{
+  background: rgba(248,244,235,0.92);
+  backdrop-filter: blur(14px);
+  border-color: rgba(190,169,118,0.25);
+  padding: 16px clamp(24px, 4vw, 64px);
+}
+.brand{
+  display:flex; align-items:baseline; gap:18px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.brand__mark{
+  font-family: "Cinzel", "Cormorant Garamond", serif;
+  font-weight:500;
+  font-size: clamp(20px, 1.9vw, 28px);
+  letter-spacing:.38em;
+  color:var(--c-navy);
+  position:relative;
+  padding-right: 4px;
+}
+/* ロゴの下の極細金線アクセント */
+.brand__mark::after{
+  content:""; position:absolute;
+  left: 0; right: 14px; bottom: -6px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--c-gold), transparent);
+}
+.brand__sub{
+  font-family:var(--f-jp-serif);
+  font-weight: 400;
+  font-size: clamp(12px, 0.95vw, 14px);
+  letter-spacing:.24em;
+  color:var(--t-sub);
+  white-space: nowrap;
+  position:relative;
+  padding-left: 18px;
+}
+/* ロゴと社名の間の縦の細線 */
+.brand__sub::before{
+  content:""; position:absolute;
+  left: 0; top: 50%;
+  width: 1px; height: 14px;
+  background: rgba(190,169,118,0.6);
+  transform: translateY(-50%);
+}
+.nav{
+  display:flex; align-items:center;
+  gap: clamp(20px, 2.6vw, 44px);
+  font-family: var(--f-jp-serif);
+  font-size: clamp(14px, 1.05vw, 16px);
+  letter-spacing:.2em;
+  white-space: nowrap;
+}
+.nav a{
+  color:var(--c-navy); position:relative;
+  padding: 8px 0;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color .3s var(--ease);
+}
+.nav a::after{
+  content:""; position:absolute; left:0; bottom:0;
+  width:0; height:1px; background:var(--c-gold);
+  transition: width .4s var(--ease);
+}
+.nav a:hover{ color:var(--c-gold); }
+.nav a:hover::after{ width:100%; }
+
+/* マイページ CTA：ゴールドのピル */
+.nav__cta{
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--c-navy);
+  color:#fff !important;
+  padding: 12px 26px;
+  border-radius: var(--r-pill);
+  letter-spacing:.22em;
+  font-family: var(--f-jp-serif);
+  font-size: clamp(13px, 0.95vw, 14px);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+  box-shadow: 0 6px 16px rgba(13,44,61,0.18);
+  border: 1px solid rgba(190,169,118,0.25);
+}
+.nav__cta::after{ display:none; }
+.nav__cta:hover{
+  background:var(--c-navy-deep);
+  color:var(--c-gold) !important;
+  transform:translateY(-2px);
+  box-shadow: 0 10px 22px rgba(13,44,61,0.28);
+}
+.nav-toggle{ display:none; }
+
+@media (max-width: 980px){
+  .nav{ display:none; }
+  .nav-toggle{
+    display:flex; flex-direction:column; gap:5px;
+    width:40px; height:40px; align-items:center; justify-content:center;
+  }
+  .nav-toggle span{ width:26px; height:1px; background:var(--c-navy); transition:.3s; }
+}
+@media (max-width: 540px){
+  .brand__sub{ display:none; }
+  .brand__mark{ letter-spacing:.28em; }
+}
+
+/* ==========================================================
+ *  ヒーロー（元サイト準拠：背景画像＋中央テキスト）
+ * ========================================================== */
+.hero{
+  position:relative; min-height: 100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding: 120px clamp(20px, 5vw, 60px) 80px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg, rgba(248,244,235,0.55) 0%, rgba(248,244,235,0.85) 100%),
+    radial-gradient(800px 500px at 70% 20%, rgba(190,169,118,0.22), transparent 60%),
+    linear-gradient(135deg, #fbf7ee 0%, #efe6cf 50%, #f8f4eb 100%);
+}
+/* リビング/カフェ風の柔らかい背景パターン */
+.hero::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.6) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(190,169,118,0.12) 0%, transparent 35%);
+  filter: blur(40px);
+}
+/* 斜線パターンは廃止。代わりに上品な金箔風のソフトグレインを薄く重ねる */
+.hero::after{
+  content:""; position:absolute; inset:0; z-index:0; opacity:.5; pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(190,169,118,0.18), transparent 60%),
+    radial-gradient(1px 1px at 65% 70%, rgba(190,169,118,0.14), transparent 60%),
+    radial-gradient(1.5px 1.5px at 80% 20%, rgba(190,169,118,0.10), transparent 60%);
+  background-size: 220px 220px, 260px 260px, 320px 320px;
+}
+.hero__inner{
+  position:relative; z-index:3;
+  text-align:center;
+  max-width: 980px; margin:0 auto; width:100%;
+}
+.hero__deco-en{
+  position:absolute; left:50%; top: 30%; transform:translateX(-50%);
+  font-family:var(--f-en-deco);
+  font-size: clamp(80px, 18vw, 240px);
+  font-weight:500;
+  line-height:.85;
+  color: rgba(13,44,61,0.06);
+  letter-spacing:.06em;
+  white-space:nowrap;
+  z-index:1; pointer-events:none;
+  user-select:none;
+  text-align:center;
+}
+.hero__deco-en .l2{
+  display:block; padding-top: 0;
+  color: rgba(190,169,118,0.20);
+}
+.hero__txt{ position:relative; z-index:3; }
+.hero__eyebrow{
+  display:inline-flex; align-items:center; gap:14px;
+  font-family:var(--f-en-deco);
+  font-size:13px; letter-spacing:.4em;
+  color:var(--c-gold);
+  margin-bottom: 28px;
+}
+.hero__eyebrow::before, .hero__eyebrow::after{
+  content:""; width:42px; height:1px; background:var(--c-gold);
+}
+.hero__title{
+  font-family:var(--f-jp-serif);
+  font-weight:500;
+  font-size: clamp(30px, 5vw, 60px);
+  line-height:1.5;
+  color:var(--c-navy);
+  letter-spacing:.06em;
+  margin-bottom: 36px;
+  position:relative;
+  display:inline-block;
+}
+.hero__title .hl{
+  position:relative;
+  padding: 0 6px;
+  font-style: italic;
+  color: var(--c-gold);
+}
+.hero__title .hl::before{
+  content:""; position:absolute;
+  left: 0; right: 0; bottom: -6px;
+  height: 1px; background: var(--c-gold); opacity:.85;
+}
+.hero__title .hl::after{
+  content:""; position:absolute;
+  left: 8px; right: 8px; bottom: -10px;
+  height: 1px; background: var(--c-gold); opacity:.5;
+}
+.hero__title small{
+  display:block;
+  font-family:var(--f-en-deco);
+  font-size:.30em; letter-spacing:.4em;
+  color:var(--c-gold);
+  font-weight:400;
+  margin-bottom: 14px;
+}
+.hero__lead{
+  font-family:var(--f-jp-serif);
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height:2.15;
+  color:var(--t-onbg-cream);
+  max-width: 820px;
+  margin: 0 auto 48px;
+  letter-spacing: .08em;
+}
+.hero__actions{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+
+/* スクロール案内 */
+.hero__scroll{
+  position:absolute; left: 30px; bottom: 30px; z-index:5;
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--f-en-deco); font-size:12px;
+  letter-spacing:.3em; color:var(--c-navy);
+  writing-mode: vertical-rl;
+}
+.hero__scroll::after{
+  content:""; width:1px; height:60px;
+  background: linear-gradient(180deg, var(--c-navy), transparent);
+  animation: scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine{
+  0%{ transform-origin: top; transform: scaleY(0); }
+  50%{ transform-origin: top; transform: scaleY(1); }
+  51%{ transform-origin: bottom; transform: scaleY(1); }
+  100%{ transform-origin: bottom; transform: scaleY(0); }
+}
+
+@media (max-width: 900px){
+  .hero{ padding-top: 100px; }
+  .hero__scroll{ display:none; }
+}
+
+/* ==========================================================
+ *  共通：セクションタイトル
+ * ========================================================== */
+.section{
+  position:relative;
+  padding: clamp(80px, 12vw, 160px) clamp(20px, 5vw, 80px);
+}
+.section--white{ background:var(--bg-white); }
+.section--cream-deep{ background:var(--bg-cream-deep); }
+.section--ink{ background:var(--bg-ink); color:#eaeaf0; }
+
+.section__inner{ max-width:1240px; margin:0 auto; width:100%; position:relative; z-index:2; }
+
+/* セクション間のオーナメント仕切り */
+.divider{
+  display:flex; align-items:center; justify-content:center;
+  gap: 18px;
+  padding: 8px 20px 0;
+  margin: -20px auto 0;
+  max-width: 360px;
+  position:relative; z-index:3;
+}
+.divider::before,
+.divider::after{
+  content:""; flex:1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-gold), transparent);
+  opacity:.7;
+}
+.divider__mark{
+  width: 8px; height: 8px;
+  border:1px solid var(--c-gold);
+  transform: rotate(45deg);
+  position:relative;
+}
+.divider__mark::after{
+  content:""; position:absolute; inset: 2px;
+  background: var(--c-gold); opacity:.6;
+}
+
+.s-head{
+  text-align:center; margin-bottom: clamp(60px, 8vw, 110px);
+  position:relative;
+}
+.s-head__en{
+  display:block;
+  font-family:var(--f-en-deco);
+  font-weight:300;
+  font-style: italic;
+  font-size: clamp(54px, 9vw, 120px);
+  letter-spacing:.04em;
+  line-height:1;
+  color: rgba(190,169,118,0.18);
+  margin-bottom: 18px;
+  user-select:none;
+}
+.section--ink .s-head__en{ color: rgba(190,169,118,0.22); }
+.s-head__jp{
+  display:inline-block; position:relative;
+  font-family:var(--f-jp-serif);
+  font-weight:500;
+  font-size: clamp(26px, 3.2vw, 40px);
+  color: var(--c-navy);
+  letter-spacing:.18em;
+  padding: 0 18px 22px;
+  margin-top: -42px;
+  background: none;
+}
+/* タイトル下に上品な金線＋中央のひし形装飾 */
+.s-head__jp::before{
+  content:""; position:absolute; bottom: 6px;
+  left: 50%; transform: translateX(-50%);
+  width: 80px; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--c-gold) 25%,
+    var(--c-gold) 75%,
+    transparent 100%);
+}
+.s-head__jp::after{
+  content:""; position:absolute; bottom: 3px;
+  left: 50%;
+  width: 7px; height: 7px;
+  background: var(--c-gold);
+  transform: translateX(-50%) rotate(45deg);
+}
+.section--ink .s-head__jp{ color:#fff; }
+.s-head__sub{
+  display:block; margin-top: 22px;
+  font-size:12px; letter-spacing:.4em;
+  color: var(--c-gold);
+  font-family:var(--f-en-deco);
+  font-style: italic;
+}
+
+/* ==========================================================
+ *  ボタン
+ * ========================================================== */
+.btn{
+  position:relative; overflow:hidden;
+  display:inline-flex; align-items:center; justify-content:center; gap:12px;
+  min-width: 220px; padding: 16px 30px;
+  border-radius: var(--r-pill);
+  font-family:var(--f-jp-sans); font-weight:500;
+  font-size:14px; letter-spacing:.2em;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+  border: 1px solid transparent;
+}
+.btn::after{
+  content:""; width:18px; height:1px; background:currentColor;
+  position:relative;
+  transition: width .4s var(--ease);
+}
+.btn:hover::after{ width:30px; }
+.btn--primary{
+  /* メタリックゴールド：ハイライトと陰影を重ねた立体感 */
+  background:
+    linear-gradient(135deg,
+      #e8d39a 0%,
+      #d4b87a 22%,
+      #b89858 50%,
+      #d4b87a 78%,
+      #e8d39a 100%);
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.45);
+  box-shadow:
+    0 10px 24px rgba(160,128,72,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 0 rgba(120,90,40,0.25);
+  text-shadow: 0 1px 0 rgba(120,90,40,0.25);
+}
+.btn--primary:hover{
+  background:
+    linear-gradient(135deg,
+      #f0dca4 0%,
+      #dcc084 22%,
+      #c0a062 50%,
+      #dcc084 78%,
+      #f0dca4 100%);
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 36px rgba(160,128,72,0.36),
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 rgba(120,90,40,0.3);
+}
+.btn--ink{
+  background: var(--c-navy); color:#fff;
+  box-shadow: 0 10px 24px rgba(13,44,61,0.18);
+}
+.btn--ink:hover{ background: var(--c-navy-deep); transform: translateY(-3px); box-shadow: 0 18px 36px rgba(13,44,61,0.28); }
+.btn--ghost{
+  border-color: var(--c-navy); color:var(--c-navy);
+}
+.btn--ghost:hover{ background: var(--c-navy); color:#fff; transform: translateY(-3px); }
+.btn--text{
+  min-width: auto; padding: 0; gap: 14px;
+  color: var(--c-navy); font-size:13px;
+}
+.btn--text::after{ width:30px; }
+.btn--text:hover{ color: var(--c-gold); }
+.btn--text:hover::after{ background: var(--c-gold); width:46px; }
+
+/* ==========================================================
+ *  AI相談「澪先生」セクション
+ * ========================================================== */
+.mio{
+  position:relative;
+  padding: clamp(100px, 14vw, 180px) clamp(20px, 5vw, 80px);
+  background: linear-gradient(180deg, var(--bg-cream) 0%, #f3ecdb 100%);
+  overflow:hidden;
+}
+.mio__bg{
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(600px 400px at 10% 20%, rgba(252,226,107,0.18), transparent),
+    radial-gradient(800px 500px at 90% 80%, rgba(190,169,118,0.18), transparent);
+  pointer-events:none;
+}
+.mio__deco{
+  position:absolute; left:50%; top:8%; transform:translateX(-50%);
+  font-family:var(--f-en-deco);
+  font-size: clamp(80px, 14vw, 200px);
+  letter-spacing:.04em;
+  color: rgba(13,44,61,0.04);
+  white-space:nowrap; pointer-events:none; user-select:none;
+}
+.mio__inner{
+  position:relative; max-width:1180px; margin:0 auto;
+  display:grid; grid-template-columns: 1fr 1.1fr;
+  gap: clamp(30px, 6vw, 90px);
+  align-items:center;
+}
+.mio__visual{
+  position:relative; aspect-ratio: 1/1.05;
+  max-width: 460px; margin: 0 auto;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #ffffff 0%, #f7efde 100%);
+  box-shadow: var(--sh-deep);
+  padding: 18px;          /* 金線フレームの内側に画像を収める */
+  overflow:hidden;
+}
+/* 内側の金色フレーム（額縁） */
+.mio__visual::before{
+  content:""; position:absolute; inset:14px;
+  border:1px solid rgba(190,169,118,0.55);
+  border-radius: 10px;
+  pointer-events:none;
+  z-index:3;
+}
+/* 下部の柔らかい金色のグロー */
+.mio__visual::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:40%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(190,169,118,0.18), transparent 70%);
+  z-index:1; pointer-events:none;
+  border-radius: 0 0 18px 18px;
+}
+/* 画像：金線フレームに合わせてフィット */
+.mio__visual img{
+  position:relative; z-index:2;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 30%;   /* 顔（やや上）にフォーカス */
+  border-radius: 8px;            /* 金フレームの角と揃える */
+  filter: drop-shadow(0 16px 32px rgba(13,44,61,0.18));
+}
+.mio__visual-tag{
+  position:absolute; top:24px; left:24px; z-index:3;
+  font-family:var(--f-en-deco);
+  font-size: 11px; letter-spacing:.4em;
+  color: var(--c-gold);
+  display:flex; align-items:center; gap:10px;
+  background: rgba(255,255,255,0.85);
+  padding: 6px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+.mio__visual-tag::before{ content:""; width:18px; height:1px; background:var(--c-gold); }
+/* 浮きバッジ：顔を隠さないよう右下の枠外に配置（picture境界の外側） */
+.mio__visual-floating{
+  position:absolute;
+  left: -24px;
+  bottom: -22px;
+  z-index:4;
+  background:#fff;
+  padding: 12px 18px;
+  border-radius: 999px;
+  box-shadow: var(--sh-mid);
+  display:flex; align-items:center; gap:10px;
+  font-size:12px; color:var(--t-sub);
+  white-space:nowrap;
+  animation: floatY 4s ease-in-out infinite;
+  border:1px solid rgba(190,169,118,0.25);
+}
+.mio__visual-floating .dot{
+  width:8px; height:8px; border-radius:50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 4px rgba(74,222,128,0.2);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes floatY{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+@keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+.mio__txt h3{
+  font-family:var(--f-jp-serif); font-weight:500;
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height:1.4;
+  color: var(--c-navy);
+  margin-bottom: 14px;
+  letter-spacing:.06em;
+}
+.mio__txt h3 small{
+  display:block;
+  font-family:var(--f-en-deco);
+  font-size:13px; letter-spacing:.4em;
+  color: var(--c-gold);
+  margin-bottom: 10px;
+  font-weight:400;
+}
+.mio__txt p{
+  font-family:var(--f-jp-serif);
+  font-size: clamp(15px, 1.15vw, 18px);
+  line-height: 2.15;
+  color: var(--t-onbg-cream);
+  margin-bottom: 24px;
+  letter-spacing: .08em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.mio__txt .note{
+  display:inline-block;
+  font-size:12px; letter-spacing:.1em;
+  background:#fff; color:var(--t-sub);
+  padding:8px 14px; border-radius: 999px;
+  border:1px solid var(--line);
+  margin-bottom: 28px;
+}
+.mio__actions{ display:flex; gap:18px; flex-wrap:wrap; }
+
+@media (max-width: 900px){
+  .mio__inner{ grid-template-columns: 1fr; }
+  .mio__visual{ max-width: 360px; margin: 0 auto; }
+}
+
+/* ==========================================================
+ *  コンテンツカード（エディトリアル・マガジンスタイル）
+ *  ── paris-yugao 流：余白・ヘアライン・大きな数字・写真主役
+ * ========================================================== */
+.cards{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(28px, 3vw, 48px);
+  perspective: 1400px;
+}
+@media (max-width: 900px){ .cards{ grid-template-columns: 1fr; } }
+
+.card{
+  position:relative;
+  background:#fff;
+  border-radius: 4px;                   /* 角を抑えてエディトリアル感 */
+  padding: 0;
+  text-align:left;
+  box-shadow:
+    0 1px 0 rgba(13,44,61,0.05),
+    0 24px 48px -28px rgba(13,44,61,0.18);
+  transition: transform .8s var(--ease), box-shadow .8s var(--ease);
+  transform-style: preserve-3d;
+  overflow:hidden;
+  border: 1px solid rgba(190,169,118,0.18);
+}
+.card:hover{
+  transform: translateY(-12px);
+  box-shadow:
+    0 1px 0 rgba(190,169,118,0.35),
+    0 40px 70px -30px rgba(13,44,61,0.28);
+}
+/* インデックス番号（カード右上に大きく出版物風） */
+.card__num{
+  position:absolute; top:22px; right:26px;
+  font-family:var(--f-en-deco);
+  font-weight:400;
+  font-size: 88px; line-height:1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(190,169,118,0.55);
+  letter-spacing:.02em;
+  z-index:3;
+  pointer-events:none;
+  transition: -webkit-text-stroke-color .6s var(--ease), color .6s var(--ease);
+}
+.card:hover .card__num{
+  color: rgba(190,169,118,0.18);
+  -webkit-text-stroke-color: rgba(190,169,118,0.85);
+}
+
+/* ── 写真エリア：クリームの紙タイル、装飾は最小限 ── */
+.card__media{
+  position:relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  margin: 0;
+  display:flex; align-items:center; justify-content:center;
+  background:
+    linear-gradient(180deg, #fbf7ec 0%, #f3ecd8 100%);
+  overflow:hidden;
+  isolation:isolate;
+}
+/* 上下のヘアライン金線（極細・常時表示） */
+.card__media::before{
+  content:""; position:absolute;
+  left: 28px; right: 28px; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(190,169,118,0.85) 30%,
+    rgba(190,169,118,0.85) 70%,
+    transparent 100%);
+}
+/* 左右の縦ヘアライン（額縁を最小限に示唆） */
+.card__media::after{
+  content:""; position:absolute;
+  left: 24px; top: 24px; bottom: 16px; width: 1px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(190,169,118,0.5) 50%,
+    transparent 100%);
+}
+.card__media img{
+  position:relative; z-index:2;
+  max-width: 70%; max-height: 78%;
+  object-fit: contain;
+  transition: transform 1s var(--ease), filter .6s var(--ease);
+  filter: drop-shadow(0 12px 20px rgba(13,44,61,0.12));
+}
+.card:hover .card__media img{
+  transform: scale(1.05);
+  filter: drop-shadow(0 18px 28px rgba(13,44,61,0.18));
+}
+/* 角の小さな金のコーナーマーカー（4隅） */
+.card__media-frame{ position:absolute; inset:14px; pointer-events:none; z-index:3; }
+.card__media-frame::before,
+.card__media-frame::after{
+  content:""; position:absolute; width:14px; height:14px;
+  border:1px solid rgba(190,169,118,0.7);
+}
+.card__media-frame::before{ top:0; left:0; border-right:none; border-bottom:none; }
+.card__media-frame::after{ bottom:0; right:0; border-left:none; border-top:none; }
+
+/* ── テキストエリア ── */
+.card__body{
+  padding: 32px 30px 36px;
+  position:relative;
+}
+.card__cat{
+  display:inline-block;
+  font-family:var(--f-en-deco);
+  font-size:13px; letter-spacing:.42em;
+  color:var(--c-gold);
+  margin-bottom: 14px;
+  position:relative;
+}
+.card__cat::after{ content:none; }            /* 旧アンダーライン廃止 */
+.card__title{
+  font-family:var(--f-jp-serif); font-weight:500;
+  font-size: clamp(20px, 1.5vw, 24px);
+  letter-spacing:.1em;
+  line-height: 1.55;
+  color: var(--c-navy);
+  margin: 0 0 18px;
+  min-height: auto;
+  position:relative;
+  word-break: keep-all;
+}
+/* タイトル下のヘアライン金線 */
+.card__title::after{
+  content:""; display:block;
+  width: 36px; height: 1px;
+  background: var(--c-gold);
+  margin-top: 16px;
+  transition: width .6s var(--ease);
+}
+.card:hover .card__title::after{ width: 64px; }
+.card__desc{
+  font-size: 15px; color: var(--t-sub);
+  margin-bottom: 30px;
+  letter-spacing:.08em; line-height: 2;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.card__actions{
+  display:flex; flex-direction:column; gap:14px; align-items:flex-start;
+}
+.card__sub-link{
+  font-size:12px; color: var(--c-navy);
+  letter-spacing:.18em;
+  border-bottom:1px solid var(--c-gold);
+  padding-bottom:3px;
+  transition: color .3s var(--ease), border-color .3s var(--ease);
+}
+.card__sub-link:hover{ color:var(--c-gold); }
+/* カード内のCTAボタンは少しコンパクトに */
+.card .btn{ min-width: auto; padding: 14px 26px; font-size:13px; letter-spacing:.18em; }
+
+/* ==========================================================
+ *  CTA：相談セクション（マスク風）
+ * ========================================================== */
+.cta-consult{
+  position:relative;
+  padding: clamp(100px, 14vw, 180px) clamp(20px, 5vw, 80px);
+  background:#fff;
+  overflow:hidden;
+}
+.cta-consult__bg{
+  position:absolute; inset:0; z-index:0;
+  background:
+    linear-gradient(180deg, #fff 0%, #faf6ec 100%);
+}
+.cta-consult__bg::before{
+  content:""; position:absolute;
+  width: 60vw; height: 60vw; max-width:600px; max-height:600px;
+  right:-12vw; top:50%; transform:translateY(-50%);
+  background: radial-gradient(circle, rgba(190,169,118,0.18), transparent 70%);
+  border-radius:50%;
+}
+.cta-consult__inner{
+  position:relative; z-index:2;
+  max-width:1100px; margin:0 auto;
+  display:grid; grid-template-columns: 1fr 1fr;
+  align-items:center; gap: clamp(30px, 6vw, 80px);
+}
+.cta-consult__inner--center{
+  display:block; max-width:1000px;
+}
+.cta-consult__txt p{ margin-bottom:18px; }
+.cta-consult__visual{
+  position:relative;
+  aspect-ratio: 4/5;
+  border-radius: 0 220px 12px 12px;
+  overflow:hidden;
+  box-shadow: var(--sh-deep);
+  background:#0d2c3d;
+}
+.cta-consult__visual img{ width:100%; height:100%; object-fit:cover; }
+.cta-consult__visual::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(180deg, transparent 30%, rgba(13,44,61,.55));
+}
+.cta-consult__visual-cap{
+  position:absolute; left:24px; bottom:24px; z-index:2; color:#fff;
+  font-family:var(--f-jp-serif);
+}
+.cta-consult__visual-cap b{ display:block; font-size:22px; letter-spacing:.06em; font-weight:500; }
+.cta-consult__visual-cap span{ font-size:11px; letter-spacing:.3em; opacity:.8; font-family:var(--f-en-deco); }
+
+.cta-consult__txt h3{
+  font-family:var(--f-jp-serif); font-weight:500;
+  font-size: clamp(26px, 3vw, 38px); line-height:1.5;
+  color: var(--c-navy);
+  margin-bottom: 24px;
+  letter-spacing:.06em;
+}
+.cta-consult__txt h3 small{
+  display:block;
+  font-family:var(--f-en-deco);
+  font-size:14px; letter-spacing:.4em;
+  color:var(--c-gold);
+  font-weight:400;
+  margin-bottom:14px;
+}
+.cta-consult__txt p{
+  font-family:var(--f-jp-serif);
+  color: var(--t-onbg-cream);
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 2.15;
+  margin-bottom: 32px;
+  letter-spacing: .08em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.cta-consult__txt .strong{
+  color: var(--c-navy);
+  padding: 0 2px;
+  font-weight:600;
+  border-bottom: 1px solid var(--c-gold);
+  box-shadow: inset 0 -3px 0 rgba(190,169,118,0.10);
+}
+
+@media (max-width: 900px){
+  .cta-consult__inner{ grid-template-columns: 1fr; }
+  .cta-consult__visual{ max-width:420px; margin: 0 auto; aspect-ratio:4/4.4; border-radius: 0 160px 12px 12px; }
+}
+
+/* ==========================================================
+ *  相談先2カラム
+ * ========================================================== */
+.partners{
+  display:grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+}
+@media (max-width:780px){ .partners{ grid-template-columns:1fr; } }
+.partner{
+  background:#fff;
+  border-radius: var(--r-lg);
+  padding: 36px 32px;
+  border:1px solid var(--line-soft);
+  box-shadow: var(--sh-soft);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+  position:relative;
+  overflow:hidden;
+}
+.partner:hover{ transform: translateY(-6px); box-shadow: var(--sh-mid); }
+.partner__head{
+  display:flex; align-items:center; gap:16px;
+  padding-bottom:18px; margin-bottom:22px;
+  border-bottom:1px solid var(--line);
+}
+.partner__icon{
+  width:54px; height:54px; border-radius:14px;
+  background:linear-gradient(160deg, #faf6ec, #ece2c8);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  font-family:var(--f-en-deco);
+  font-size:18px; color:var(--c-gold);
+}
+.partner__title{
+  font-family:var(--f-jp-serif); font-weight:500;
+  font-size:18px; letter-spacing:.1em;
+  color:var(--c-navy);
+}
+.partner__title small{
+  display:block;
+  font-family:var(--f-en-deco);
+  font-size:11px; letter-spacing:.4em;
+  color:var(--c-gold);
+  margin-top: 4px;
+}
+.partner__body{ font-size:14px; color:var(--t-sub); line-height:2; }
+.partner__body strong{ color: var(--c-navy); }
+.partner__logo{
+  display:flex; align-items:center; justify-content:center;
+  height: 70px; margin-bottom:16px;
+  font-family:var(--f-en-deco); font-size:24px;
+  color: var(--c-navy); letter-spacing:.18em;
+  border:1px dashed var(--line);
+  border-radius: 8px;
+  background: linear-gradient(160deg, #faf6ec, #ffffff);
+}
+.partner__logo img{ max-height:56px; width:auto; }
+
+/* ==========================================================
+ *  アコーディオン
+ * ========================================================== */
+.accordion{
+  background:#fff; border-radius: var(--r-md);
+  border:1px solid var(--line-soft);
+  margin-top: 30px;
+  overflow:hidden;
+  box-shadow: var(--sh-soft);
+}
+.accordion__head{
+  width:100%; text-align:left;
+  padding: 22px 26px;
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:var(--f-jp-serif); font-weight:500;
+  font-size:15px; color:var(--c-navy); letter-spacing:.1em;
+}
+.accordion__icon{
+  width:28px; height:28px; border-radius:50%;
+  background:var(--c-navy); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px;
+  transition: transform .4s var(--ease), background .4s var(--ease);
+}
+.accordion.is-open .accordion__icon{ transform: rotate(45deg); background: var(--c-gold); }
+.accordion__body{
+  max-height:0; overflow:hidden;
+  transition: max-height .5s var(--ease);
+  background: #fbfaf6;
+}
+.accordion__body-inner{
+  padding: 0 26px 26px;
+  font-size:14px; line-height:2; color:var(--t-sub);
+}
+.accordion.is-open .accordion__body{ max-height:400px; }
+
+/* ==========================================================
+ *  フッター
+ * ========================================================== */
+.footer{
+  background: var(--bg-ink);
+  color: #c8d0d9;
+  padding: 80px clamp(20px, 5vw, 80px) 30px;
+  position:relative;
+  overflow:hidden;
+}
+.footer::before{
+  content:"REALIZE CLUB";
+  position:absolute; left: 50%; top: -10px; transform:translateX(-50%);
+  font-family:var(--f-en-deco);
+  font-size: clamp(60px, 14vw, 200px);
+  color: rgba(255,255,255,0.03);
+  white-space:nowrap; pointer-events:none;
+  letter-spacing:.16em;
+}
+.footer__inner{
+  position:relative; z-index:2;
+  max-width:1240px; margin:0 auto;
+}
+.footer__top{
+  display:grid; grid-template-columns: 1.4fr 2.6fr;
+  gap: 60px; padding-bottom: 50px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 36px;
+}
+@media (max-width:900px){ .footer__top{ grid-template-columns: 1fr; gap: 40px; } }
+.footer__brand{ font-family:var(--f-en-deco); }
+.footer__brand b{ display:block; font-size:24px; letter-spacing:.32em; color:#fff; margin-bottom:8px; }
+.footer__brand span{ font-family:var(--f-jp-serif); font-size:13px; color:#a4adb6; letter-spacing:.2em; }
+.footer__brand p{ margin-top: 22px; font-size:13px; line-height:2; color:#a4adb6; }
+
+.footer__cols{
+  display:grid; grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+@media (max-width:600px){ .footer__cols{ grid-template-columns: 1fr; } }
+.footer__col h4{
+  font-family:var(--f-en-deco); font-size:13px; letter-spacing:.4em;
+  color:var(--c-gold); padding-bottom:12px; margin-bottom:18px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.footer__col ul{ list-style:none; }
+.footer__col li{
+  font-size:13px; padding: 7px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+.footer__col a{ color:#c8d0d9; display:flex; align-items:center; gap:10px; transition: color .3s var(--ease), padding-left .3s var(--ease); }
+.footer__col a::before{
+  content:"›"; color: var(--c-gold);
+  transition: transform .3s var(--ease);
+}
+.footer__col a:hover{ color:#fff; padding-left:6px; }
+.footer__col a:hover::before{ transform: translateX(3px); }
+
+.footer__bot{
+  text-align:center; font-size:11px; letter-spacing:.3em;
+  color:#7d8691; padding-top: 24px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+
+/* ==========================================================
+ *  フェードイン
+ * ========================================================== */
+.js-fade{ opacity:0; transform: translateY(40px); transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); }
+.js-fade.is-active{ opacity:1; transform: translateY(0); }
+.js-fade-wrap > .js-fade-child{ opacity:0; transform: translateY(40px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+.js-fade-wrap.is-active > .js-fade-child{ opacity:1; transform: translateY(0); }
+.js-fade-wrap.is-active > .js-fade-child:nth-child(1){ transition-delay: .0s; }
+.js-fade-wrap.is-active > .js-fade-child:nth-child(2){ transition-delay: .15s; }
+.js-fade-wrap.is-active > .js-fade-child:nth-child(3){ transition-delay: .30s; }
+.js-fade-wrap.is-active > .js-fade-child:nth-child(4){ transition-delay: .45s; }
+
+/* ==========================================================
+ *  Top scroll
+ * ========================================================== */
+.totop{
+  position:fixed; right: 24px; bottom: 24px; z-index:100;
+  width:48px; height:48px; border-radius:50%;
+  background:var(--c-navy); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--sh-mid);
+  opacity:0; transform: translateY(20px); pointer-events:none;
+  transition: opacity .4s var(--ease), transform .4s var(--ease), background .3s var(--ease);
+}
+.totop.is-show{ opacity:1; transform: translateY(0); pointer-events:auto; }
+.totop:hover{ background:var(--c-gold); }
+
+/* ==========================================================
+ *  プレースホルダ画像
+ * ========================================================== */
+.placeholder{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--f-en-deco);
+  letter-spacing:.3em; font-size:14px;
+  color: rgba(255,255,255,0.6);
+  background: linear-gradient(135deg, #1d3a4d 0%, #0d2c3d 50%, #1f4a5e 100%);
+  position:relative;
+  overflow:hidden;
+}
+.placeholder::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(190,169,118,0.10), transparent 50%);
+}
+.placeholder--cream{ background: linear-gradient(135deg, #f8f4eb 0%, #ece2c8 100%); color: var(--c-gold); }
+.placeholder--icon{ width:100%; height:100%; aspect-ratio:1; }
+.placeholder span{ position:relative; z-index:2; text-align:center; padding: 0 10px; }
+
+</style>
+</head>
+
+<body>
+
+<!-- ========================================
+ ローダー
+ ======================================== -->
+<div class="loader" id="loader">
+  <div class="loader__logo">REALIZE CLUB</div>
+</div>
+
+<!-- ========================================
+ ヘッダー
+ ======================================== -->
+<header class="site-header" id="siteHeader">
+  <a href="#" class="brand">
+    <span class="brand__mark">REALIZE CLUB</span>
+    <span class="brand__sub">日本リアライズ株式会社</span>
+  </a>
+  <nav class="nav" aria-label="グローバル">
+    <a href="#mio">AI相談</a>
+    <a href="#life">人生設計</a>
+    <a href="#living">生活支援</a>
+    <a href="#consult">ご相談</a>
+    <a href="#" class="nav__cta">マイページ</a>
+  </nav>
+  <button class="nav-toggle" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- ========================================
+ ヒーロー（元サイト準拠：中央タイトル＋背景）
+ ======================================== -->
+<section class="hero">
+  <div class="hero__deco-en" data-rellax-speed="-.2">
+    <span>REALIZE</span>
+    <span class="l2">CONTENTS</span>
+  </div>
+
+  <div class="hero__inner">
+    <div class="hero__txt js-fade-wrap">
+      <span class="hero__eyebrow js-fade-child">REALIZE CLUB MEMBER'S PORTAL</span>
+      <h1 class="hero__title js-fade-child">
+        <small>For Your Life Design</small>
+        リアライズクラブ <span class="hl">各種コンテンツ</span>
+      </h1>
+      <p class="hero__lead js-fade-child">
+        リアライズクラブでは、会員の皆様が毎日、楽しく、そして有意義にご利用いただけるコンテンツを提供しております。普段の生活のヒントになるコンテンツをたくさん用意しておりますので、是非毎日ご利用ください。
+      </p>
+      <div class="hero__actions js-fade-child">
+        <a href="#mio" class="btn btn--primary">コンテンツを見る</a>
+        <a href="#consult" class="btn btn--ghost">ご相談はこちら</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__scroll">SCROLL</div>
+</section>
+
+<!-- ========================================
+ AI相談「澪先生」
+ ======================================== -->
+<section class="mio" id="mio">
+  <div class="mio__bg"></div>
+  <div class="mio__deco">AI CONCIERGE</div>
+
+  <div class="mio__inner">
+    <div class="mio__visual js-fade">
+      <img src="images/mio-sensei.png" alt="AI相談 澪先生">
+    </div>
+
+    <div class="mio__txt js-fade-wrap">
+      <h3 class="js-fade-child">
+        <small>AI Consultation</small>
+        AI相談「澪先生」
+      </h3>
+      <p class="js-fade-child">
+        リアライズクラブの内容を全て理解し、皆様のサポートを行います。
+        ChatGPTをカスタマイズしたオリジナル生成AIで、毎日の占いから、
+        各コンテンツの説明や、あなたの性格に合わせた人生設計提案等、
+        身近な存在として伴奏してくれるコンテンツです。
+      </p>
+      <div class="js-fade-child"><span class="note">※ご利用にはChatGPTのアカウントが必要です。</span></div>
+      <div class="mio__actions js-fade-child">
+        <a href="#" class="btn btn--primary">相談する</a>
+        <a href="#" class="btn--text">説明ページを見る →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider js-fade"><span class="divider__mark"></span></div>
+
+<!-- ========================================
+ 人生設計コンテンツ
+ ======================================== -->
+<section class="section section--white" id="life">
+  <div class="section__inner">
+    <header class="s-head js-fade">
+      <span class="s-head__en">LIFE DESIGN</span>
+      <h2 class="s-head__jp">人生設計コンテンツ</h2>
+      <span class="s-head__sub">— Design Your 100-Year Life —</span>
+    </header>
+
+    <div class="cards js-fade-wrap">
+      <article class="card js-fade-child" data-tilt>
+        <div class="card__num">01</div>
+        <div class="card__media">
+          <img src="images/realize-shindan.png" alt="リアライズ式人生診断">
+          <span class="card__media-frame"></span>
+        </div>
+        <div class="card__body">
+          <span class="card__cat">DIAGNOSIS</span>
+          <h3 class="card__title">リアライズ式人生診断</h3>
+          <p class="card__desc">あなたの価値観・気質・行動傾向を多角的に分析し、これからの人生設計に活かす診断です。</p>
+          <div class="card__actions">
+            <a href="#" class="btn btn--primary">診断する</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card js-fade-child" data-tilt>
+        <div class="card__num">02</div>
+        <div class="card__media">
+          <img src="images/digram-shindan.png" alt="ディグラム式 人生設計定点診断">
+          <span class="card__media-frame"></span>
+        </div>
+        <div class="card__body">
+          <span class="card__cat">CHECK-UP</span>
+          <h3 class="card__title">人生設計定点診断</h3>
+          <p class="card__desc">ディグラム式の心理学アプローチで、現在地と理想の差を可視化。定期的な振り返りに最適です。</p>
+          <div class="card__actions">
+            <a href="#" class="card__sub-link">説明ページを見る</a>
+            <a href="#" class="btn btn--primary">診断する</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card js-fade-child" data-tilt>
+        <div class="card__num">03</div>
+        <div class="card__media">
+          <img src="images/learning.png" alt="学習コンテンツ">
+          <span class="card__media-frame"></span>
+        </div>
+        <div class="card__body">
+          <span class="card__cat">LEARNING</span>
+          <h3 class="card__title">学習コンテンツ</h3>
+          <p class="card__desc">人生設計に役立つ知識を、いつでも学べる形でご用意。スキマ時間に少しずつ深められます。</p>
+          <div class="card__actions">
+            <a href="#" class="btn btn--ink">コンテンツを見る</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="divider js-fade"><span class="divider__mark"></span></div>
+
+<!-- ========================================
+ 生活支援コンテンツ・他
+ ======================================== -->
+<section class="section section--cream-deep" id="living">
+  <div class="section__inner">
+    <header class="s-head js-fade">
+      <span class="s-head__en">DAILY SUPPORT</span>
+      <h2 class="s-head__jp">生活支援コンテンツ・他</h2>
+      <span class="s-head__sub">— For Everyday Life —</span>
+    </header>
+
+    <div class="cards js-fade-wrap">
+      <article class="card js-fade-child" data-tilt>
+        <div class="card__num">04</div>
+        <div class="card__media">
+          <img src="images/shawari-next.png" alt="社割NEXT">
+          <span class="card__media-frame"></span>
+        </div>
+        <div class="card__body">
+          <span class="card__cat">SHOPPING</span>
+          <h3 class="card__title">社割NEXT</h3>
+          <p class="card__desc">会員様限定のお得な社販サービス。日々のお買い物がぐっと身近で、ぐっと豊かになります。</p>
+          <div class="card__actions">
+            <a href="#" class="btn btn--primary">買い物する</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card js-fade-child" data-tilt>
+        <div class="card__num">05</div>
+        <div class="card__media">
+          <img src="images/useful-apps.png" alt="お役立ちアプリ">
+          <span class="card__media-frame"></span>
+        </div>
+        <div class="card__body">
+          <span class="card__cat">USEFUL APP</span>
+          <h3 class="card__title">お役立ちアプリ</h3>
+          <p class="card__desc">毎日の暮らしに寄り添う、厳選アプリをご紹介。生活がもう少しだけ快適になります。</p>
+          <div class="card__actions">
+            <a href="#" class="btn btn--ink">コンテンツを見る</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card js-fade-child" data-tilt>
+        <div class="card__num">06</div>
+        <div class="card__media">
+          <img src="images/b-mark.png" alt="Bマークについて">
+          <span class="card__media-frame"></span>
+        </div>
+        <div class="card__body">
+          <span class="card__cat">B-MARK</span>
+          <h3 class="card__title">Bマークについて</h3>
+          <p class="card__desc">リアライズクラブ会員の証「Bマーク」。提携店舗での特別な体験へとつながる、ささやかな目印です。</p>
+          <div class="card__actions">
+            <a href="#" class="btn btn--ink">コンテンツを見る</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="divider js-fade"><span class="divider__mark"></span></div>
+
+<!-- ========================================
+ リアルな人生相談・住まいのご相談 CTA（中央寄せ・元サイト準拠）
+ ======================================== -->
+<section class="cta-consult" id="consult">
+  <div class="cta-consult__bg"></div>
+  <div class="cta-consult__inner cta-consult__inner--center">
+    <header class="s-head js-fade" style="margin-bottom:50px;">
+      <span class="s-head__en">CONSULTATION</span>
+      <h2 class="s-head__jp">リアルな人生相談、住まいのご相談はこちら</h2>
+    </header>
+
+    <div class="cta-consult__txt js-fade-wrap" style="text-align:center; max-width:860px; margin:0 auto;">
+      <p class="js-fade-child">
+        リアライズクラブの会員の皆様の最大の特典は、<span class="strong">「人生設計を理解したサポーターが、様々な相談に無料で対応してくれる事」</span>です。
+      </p>
+      <p class="js-fade-child">
+        人生設計を理解し、行動を起こそうとしたら、まずはリアライズクラブ提携先の各社へご相談することで、さらに理解が進み、必要なサービスを受けることができます。
+      </p>
+      <div class="js-fade-child" style="margin-top:18px;">
+        <a href="#" class="btn btn--ink">相談ページを見る</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+ 提携先のご紹介
+ ======================================== -->
+<section class="section section--white">
+  <div class="section__inner">
+    <header class="s-head js-fade">
+      <span class="s-head__en">PARTNERS</span>
+      <h2 class="s-head__jp">— 相談先のご紹介 —</h2>
+    </header>
+
+    <div class="partners js-fade-wrap">
+      <div class="partner js-fade-child">
+        <div class="partner__head">
+          <div class="partner__icon">FP</div>
+          <div>
+            <div class="partner__title">
+              保険についてのご相談
+              <small>INSURANCE</small>
+            </div>
+          </div>
+        </div>
+        <div class="partner__body">
+          「人生100年時代」を生きていく上で、長期的な人生設計を考えるために、
+          <strong>ファイナンシャルプランナー</strong>を交えて設計を行っていきたい方におすすめです。
+          プロの有資格者があなたに寄り添い、設計・提案をいたします。
+        </div>
+      </div>
+
+      <div class="partner js-fade-child">
+        <div class="partner__head">
+          <div class="partner__icon">LMP</div>
+          <div>
+            <div class="partner__title">
+              住宅についてのご相談
+              <small>HOUSING</small>
+            </div>
+          </div>
+        </div>
+        <div class="partner__logo">LIFE MAKE PARTNER'S</div>
+        <div class="partner__body">
+          リアライズクラブの会員様は、全員ライフメイクパートナーズとの提携による
+          <strong>「住宅購入社割制度」</strong>がございます。
+          購入を検討する前に、「人生100年時代」を考える上での住まいのあり方について、是非ご相談ください。
+        </div>
+      </div>
+    </div>
+
+    <!-- アコーディオン -->
+    <div class="accordion js-fade" id="acc1" style="max-width:760px; margin: 30px auto 0;">
+      <button class="accordion__head" type="button" onclick="document.getElementById('acc1').classList.toggle('is-open')">
+        <span>お問い合わせフォームはこちら</span>
+        <span class="accordion__icon">+</span>
+      </button>
+      <div class="accordion__body">
+        <div class="accordion__body-inner">
+          ご相談・お問い合わせは、専用フォームよりお気軽にどうぞ。内容を確認の上、担当よりご返信いたします。
+          <div style="margin-top:14px;"><a href="#" class="btn btn--primary">お問い合わせする</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+ フッター
+ ======================================== -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <b>REALIZE CLUB</b>
+        <span>日本リアライズ株式会社</span>
+        <p>会員の皆様の毎日に、楽しく有意義なヒントを。<br>人生100年時代の伴走者として。</p>
+      </div>
+      <div class="footer__cols">
+        <div class="footer__col">
+          <h4>CONTENTS</h4>
+          <ul>
+            <li><a href="#">リアライズクラブについて</a></li>
+            <li><a href="#">AI相談 澪先生</a></li>
+            <li><a href="#">リアライズ式人生診断</a></li>
+            <li><a href="#">人生設計定点診断</a></li>
+            <li><a href="#">Eラーニング</a></li>
+            <li><a href="#">社割NEXT</a></li>
+            <li><a href="#">お役立ちアプリの紹介</a></li>
+            <li><a href="#">Bマークについて</a></li>
+            <li><a href="#">各種相談</a></li>
+            <li><a href="#">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>ACCOUNT</h4>
+          <ul>
+            <li><a href="#">プライバシーポリシー</a></li>
+            <li><a href="#">マイカー</a></li>
+            <li><a href="#">マイホーム</a></li>
+            <li><a href="#">マイホーム相談窓口</a></li>
+            <li><a href="#">介護</a></li>
+            <li><a href="#">保険相談窓口</a></li>
+            <li><a href="#">利用規約</a></li>
+            <li><a href="#">婚活・育児</a></li>
+            <li><a href="#">賃貸サポート</a></li>
+            <li><a href="#">ログイン</a></li>
+            <li><a href="#">ログアウト</a></li>
+            <li><a href="#">パスワードのリセット</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bot">
+      © REALIZE CLUB（日本リアライズ株式会社）
+    </div>
+  </div>
+</footer>
+
+<button class="totop" id="toTop" aria-label="ページトップへ">↑</button>
+
+<!-- ========================================
+ JS
+ ======================================== -->
+<script>
+window.addEventListener('load', () => {
+  // ---- Loader ----
+  setTimeout(() => {
+    var l = document.getElementById('loader');
+    if (l) l.classList.add('is-hidden');
+  }, 500);
+
+  // ---- ライブラリ存在チェック（無ければ静かにフォールバック） ----
+  var hasGSAP = (typeof gsap !== 'undefined');
+  var hasST   = (typeof ScrollTrigger !== 'undefined');
+  var hasLenis = (typeof Lenis !== 'undefined');
+
+  if (!hasGSAP || !hasST) {
+    // GSAP無しでも全要素を可視化して終了
+    document.querySelectorAll('.js-fade, .js-fade-wrap').forEach(function(el){
+      el.classList.add('is-active');
+    });
+    setupSimpleFallback();
+    return;
+  }
+
+  // ---- Lenis smooth scroll（あれば使う） ----
+  var lenis = null;
+  if (hasLenis) {
+    try {
+      lenis = new Lenis({
+        duration: 1.4,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+      function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+    } catch(e){ lenis = null; console.warn('Lenis init failed', e); }
+  }
+
+  // ---- GSAP ScrollTrigger ----
+  gsap.registerPlugin(ScrollTrigger);
+  if (lenis) lenis.on('scroll', ScrollTrigger.update);
+
+  // ---- フェードイン ----
+  document.querySelectorAll('.js-fade').forEach(el => {
+    ScrollTrigger.create({
+      trigger: el, start: 'top 85%',
+      onEnter: () => el.classList.add('is-active'),
+      once: true,
+    });
+  });
+  document.querySelectorAll('.js-fade-wrap').forEach(el => {
+    el.querySelectorAll(':scope > *').forEach(c => c.classList.add('js-fade-child'));
+    ScrollTrigger.create({
+      trigger: el, start: 'top 85%',
+      onEnter: () => el.classList.add('is-active'),
+      once: true,
+    });
+  });
+
+  // ---- パララックス（rellax代替） ----
+  document.querySelectorAll('[data-rellax-speed]').forEach(el => {
+    const speed = parseFloat(el.dataset.rellaxSpeed) || 0;
+    gsap.to(el, {
+      y: () => speed * 200,
+      ease: 'none',
+      scrollTrigger: { trigger: el, scrub: true, start: 'top bottom', end: 'bottom top' }
+    });
+  });
+
+  // ---- ヘッダー：スクロールでスタイル変化 ----
+  const header = document.getElementById('siteHeader');
+  ScrollTrigger.create({
+    start: 60, end: 99999,
+    onUpdate: (self) => {
+      header.classList.toggle('is-scrolled', self.scroll() > 60);
+    }
+  });
+
+  // ---- TopScroll ボタン ----
+  const totop = document.getElementById('toTop');
+  ScrollTrigger.create({
+    start: 600, end: 99999,
+    onUpdate: (self) => totop.classList.toggle('is-show', self.scroll() > 600),
+  });
+  totop.addEventListener('click', () => {
+    if (lenis) lenis.scrollTo(0, { duration: 1.5 });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ---- ヒーロー画像のサブパララックス ----
+  gsap.to('.hero__visual img', {
+    yPercent: 8,
+    ease: 'none',
+    scrollTrigger: { trigger: '.hero', scrub: true, start: 'top top', end: 'bottom top' }
+  });
+  gsap.to('.hero__visual', {
+    scale: 0.92,
+    ease: 'none',
+    scrollTrigger: { trigger: '.hero', scrub: true, start: 'top top', end: 'bottom top' }
+  });
+
+  // ---- セクション見出しの英字を視差 ----
+  gsap.utils.toArray('.s-head__en').forEach(el => {
+    gsap.fromTo(el, { x: -40 }, {
+      x: 40, ease: 'none',
+      scrollTrigger: { trigger: el, scrub: true, start: 'top bottom', end: 'bottom top' }
+    });
+  });
+
+  // ---- 3Dカード tilt ----
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    const max = 6;  // ややマイルドに（エディトリアル感を保つ）
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      const rx = (y - 0.5) * -max;
+      const ry = (x - 0.5) * max;
+      card.style.transform = `translateY(-12px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+
+  // ---- スムーズアンカー ----
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (id.length > 1) {
+        const target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          if (lenis) lenis.scrollTo(target, { offset: -80, duration: 1.4 });
+          else target.scrollIntoView({ behavior:'smooth', block:'start' });
+        }
+      }
+    });
+  });
+
+  // ---- ResizeでScrollTrigger再計算 ----
+  window.addEventListener('resize', () => ScrollTrigger.refresh());
+});
+
+// ---- 完全フォールバック（GSAPすら無い場合） ----
+function setupSimpleFallback(){
+  var header = document.getElementById('siteHeader');
+  var totop  = document.getElementById('toTop');
+  window.addEventListener('scroll', function(){
+    var y = window.pageYOffset;
+    if (header) header.classList.toggle('is-scrolled', y > 60);
+    if (totop)  totop.classList.toggle('is-show', y > 600);
+  });
+  if (totop) totop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var id = a.getAttribute('href');
+      if (id.length > 1) {
+        var t = document.querySelector(id);
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
+      }
+    });
+  });
+}
+</script>
+
+</body>
+</html>
